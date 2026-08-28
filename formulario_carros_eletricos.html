@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesquisa - Sistema de Otimização de Rotas para Carros Elétricos</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Pesquisa de Requisitos</h1>
+    <p>Sistema de otimização de rotas para carros elétricos</p>
+  </div>
+
+  <div class="form-wrapper">
+    <p class="required-note">Todas as perguntas são obrigatórias</p>
+
+    <form id="surveyForm">
+      <div id="questionsContainer"></div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        Enviar respostas
+      </button>
+
+      <div class="status-message" id="statusMessage"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ==========================================
+  // IMPORTANTE: Substitua pela URL do seu Google Apps Script
+  // Veja o guia de configuração para obter essa URL
+  // ==========================================
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/library/d/1Z0auUuol8Z-AuIEBQ-giIkFjAjs9nuv-XI1DzMgzzAleDBt_2IXjGBBi/1';
+
+  const questions = [
+    {
+      num: 1,
+      question: "Como é sua frequência de viagens com o carro elétrico?",
+      options: [
+        "Raramente viajo, meu uso é basicamente local",
+        "Viajo ocasionalmente dentro da semana",
+        "Viajo frequentemente, combinando local e distâncias maiores"
+      ]
+    },
+    {
+      num: 2,
+      question: "Qual é o tipo de viagem que mais realiza?",
+      options: [
+        "Principalmente deslocamentos curtos dentro da cidade",
+        "Uma mistura de viagens curtas e longas",
+        "Principalmente viagens entre cidades ou trajetos longos"
+      ]
+    },
+    {
+      num: 3,
+      question: "Como você se sente em relação à autonomia da bateria durante uma viagem?",
+      options: [
+        "Não me preocupo, tenho tranquilidade sobre isso",
+        "Fico atento, mas não é algo que me tira o sono",
+        "Sinto bastante insegurança e ansiedade com isso"
+      ]
+    },
+    {
+      num: 4,
+      question: "Ao sair para uma viagem longa, como você planeja os carregamentos?",
+      options: [
+        "Não planejo com antecedência, carrego conforme acho necessário",
+        "Faço um planejamento básico antes de sair",
+        "Pesquiso e planejo detalhadamente os pontos de carga"
+      ]
+    },
+    {
+      num: 5,
+      question: "Qual é o seu principal desafio ao procurar um carregador?",
+      options: [
+        "Dificuldade em encontrar pontos de carga disponíveis",
+        "Informações sobre carregadores não são completas ou atualizadas",
+        "As informações são disponíveis, mas falta facilidade para planejar a rota"
+      ]
+    },
+    {
+      num: 6,
+      question: "Como você se sente quando perde tempo esperando ou procurando um carregador?",
+      options: [
+        "Não me incomoda muito, faz parte do processo",
+        "Fico um pouco frustrado, mas sigo em frente",
+        "Fico bastante frustrado, isso afeta meu dia"
+      ]
+    },
+    {
+      num: 7,
+      question: "Você costuma encontrar filas nos carregadores?",
+      options: [
+        "Nunca ou raramente encontro filas",
+        "Ocasionalmente encontro esperas",
+        "Frequentemente tenho que esperar para usar um carregador"
+      ]
+    },
+    {
+      num: 8,
+      question: "Já chegou a um carregador e descobriu que ele estava incompatível, quebrado ou fora de uso?",
+      options: [
+        "Nunca aconteceu comigo",
+        "Já aconteceu uma ou duas vezes",
+        "Acontece com frequência"
+      ]
+    },
+    {
+      num: 9,
+      question: "Como você se sente quanto a confiabilidade das informações sobre carregadores?",
+      options: [
+        "Confio nas informações que encontro sobre os carregadores",
+        "Às vezes as informações são precisas, às vezes não",
+        "As informações que encontro geralmente são desatualizadas"
+      ]
+    },
+    {
+      num: 10,
+      question: "Já precisou mudar seus planos (atrasar, mudar rota, cancelar algo) por causa de carregamento?",
+      options: [
+        "Nunca precisei mudar meus planos por isso",
+        "Já precisei ajustar horários pequenos",
+        "Já precisei cancelar ou adiar compromissos por causa disso"
+      ]
+    },
+    {
+      num: 11,
+      question: "Como é a sensação de ficar com pouca bateria em um lugar que você não conhece bem?",
+      options: [
+        "Não me abala, resolvo com tranquilidade",
+        "Fico um pouco tenso, mas lido bem",
+        "Fico bastante estressado e ansioso"
+      ]
+    },
+    {
+      num: 12,
+      question: "O que seria mais importante para você resolver primeiro?",
+      options: [
+        "Economizar tempo total (deslocamento + carregamento)",
+        "Ter mais clareza e previsibilidade sobre a viagem",
+        "Economizar custo com carregamento"
+      ]
+    },
+    {
+      num: 13,
+      question: "Como você se sente sobre não saber se um carregador está livre antes de chegar até ele?",
+      options: [
+        "Não me incomoda, eu me adapto quando chego lá",
+        "Seria bom saber, mas não é algo que me atrapalha muito",
+        "Isso me incomoda bastante, gostaria de saber antes"
+      ]
+    },
+    {
+      num: 14,
+      question: "Comparando com um carro a combustão, como você avalia o processo de recarga hoje?",
+      options: [
+        "Não vejo muita diferença no meu dia a dia",
+        "É um pouco mais trabalhoso, mas administrável",
+        "É consideravelmente mais estressante e demorado"
+      ]
+    },
+    {
+      num: 15,
+      question: "No geral, qual é sua maior frustração com o processo de recarga atualmente?",
+      options: [
+        "Falta de informação confiável sobre os pontos de carga",
+        "Tempo perdido esperando ou se deslocando até o carregador",
+        "Incerteza e falta de controle sobre o planejamento da viagem"
+      ]
+    }
+  ];
+
+  const container = document.getElementById('questionsContainer');
+
+  questions.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+
+    const numBadge = document.createElement('span');
+    numBadge.className = 'question-number';
+    numBadge.textContent = `Pergunta ${q.num} de ${questions.length}`;
+    card.appendChild(numBadge);
+
+    const title = document.createElement('p');
+    title.className = 'question-text';
+    title.textContent = q.question;
+    card.appendChild(title);
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'options-list';
+
+    q.options.forEach(option => {
+      const label = document.createElement('label');
+      label.className = 'option-label';
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `q${q.num}`;
+      radio.value = option;
+      radio.required = true;
+
+      const text = document.createElement('span');
+      text.className = 'option-text';
+      text.textContent = option;
+
+      label.appendChild(radio);
+      label.appendChild(text);
+      optionsDiv.appendChild(label);
+    });
+
+    card.appendChild(optionsDiv);
+
+    const otherSection = document.createElement('div');
+    otherSection.className = 'other-section';
+
+    const otherLabel = document.createElement('label');
+    otherLabel.className = 'other-label';
+    otherLabel.textContent = 'Ou escreva sua própria resposta:';
+    otherSection.appendChild(otherLabel);
+
+    const otherWrapper = document.createElement('div');
+    otherWrapper.className = 'other-input-wrapper';
+
+    const otherRadio = document.createElement('input');
+    otherRadio.type = 'radio';
+    otherRadio.name = `q${q.num}`;
+    otherRadio.value = '';
+    otherRadio.id = `other-radio-${q.num}`;
+
+    const otherInput = document.createElement('input');
+    otherInput.type = 'text';
+    otherInput.className = 'other-input';
+    otherInput.placeholder = 'Digite aqui...';
+    otherInput.disabled = true;
+
+    otherRadio.addEventListener('change', () => {
+      otherInput.disabled = !otherRadio.checked;
+      if (otherRadio.checked) otherInput.focus();
+    });
+
+    otherInput.addEventListener('input', () => {
+      otherRadio.checked = true;
+      otherRadio.value = otherInput.value;
+    });
+
+    otherWrapper.appendChild(otherRadio);
+    otherWrapper.appendChild(otherInput);
+    otherSection.appendChild(otherWrapper);
+    card.appendChild(otherSection);
+
+    container.appendChild(card);
+  });
+
+  const form = document.getElementById('surveyForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusMessage = document.getElementById('statusMessage');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const responses = {
+      timestamp: new Date().toISOString()
+    };
+
+    let allAnswered = true;
+
+    questions.forEach(q => {
+      const value = formData.get(`q${q.num}`);
+      if (!value || value.trim() === '') {
+        allAnswered = false;
+      }
+      responses[`pergunta_${q.num}`] = value || '';
+    });
+
+    if (!allAnswered) {
+      statusMessage.className = 'status-message error';
+      statusMessage.textContent = 'Por favor, responda todas as perguntas antes de enviar.';
+      statusMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    if (GOOGLE_SCRIPT_URL === 'COLE_AQUI_A_URL_DO_SEU_APPS_SCRIPT') {
+      statusMessage.className = 'status-message error';
+      statusMessage.textContent = 'Erro de configuração: URL do Google Apps Script não foi definida.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    statusMessage.className = 'status-message loading';
+    statusMessage.textContent = 'Enviando suas respostas...';
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(responses)
+      });
+
+      statusMessage.className = 'status-message success';
+      statusMessage.textContent = 'Obrigado! Suas respostas foram enviadas com sucesso.';
+      form.reset();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Respostas enviadas';
+
+    } catch (error) {
+      statusMessage.className = 'status-message error';
+      statusMessage.textContent = 'Erro ao enviar respostas. Por favor, tente novamente.';
+      submitBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
