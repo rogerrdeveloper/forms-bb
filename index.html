@@ -30,6 +30,28 @@
 </div>
 
 <script>
+  document.addEventListener('dblclick', function (event) {
+    event.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchmove', function (event) {
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    const deltaX = Math.abs(touch.clientX - (this._lastX || touch.clientX));
+    if (deltaX > 10) {
+      event.preventDefault();
+    }
+
+    this._lastX = touch.clientX;
+  }, { passive: false });
+
+  document.addEventListener('touchstart', function (event) {
+    if (event.touches.length > 0) {
+      this._lastX = event.touches[0].clientX;
+    }
+  }, { passive: true });
+
   // ==========================================
   // IMPORTANTE: Substitua pela URL do seu Google Apps Script
   // Veja o guia de configuração para obter essa URL

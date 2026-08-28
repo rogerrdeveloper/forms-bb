@@ -2,6 +2,14 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
   }
 
   body {
@@ -10,6 +18,9 @@
     color: #1a2332;
     line-height: 1.6;
     padding: 16px;
+    touch-action: pan-y;
+    overscroll-behavior-x: none;
+    user-select: none;
   }
 
   .container {
@@ -216,6 +227,7 @@
   @media (max-width: 480px) {
     body {
       padding: 8px;
+      overflow-x: hidden;
     }
 
     .header {
