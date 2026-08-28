@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
 <title>Pesquisa - Sistema de Otimização de Rotas para Carros Elétricos</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -32,25 +32,51 @@
 <script>
   document.addEventListener('dblclick', function (event) {
     event.preventDefault();
-  }, { passive: false });
-
-  document.addEventListener('touchmove', function (event) {
-    const touch = event.touches[0];
-    if (!touch) return;
-
-    const deltaX = Math.abs(touch.clientX - (this._lastX || touch.clientX));
-    if (deltaX > 10) {
-      event.preventDefault();
-    }
-
-    this._lastX = touch.clientX;
+    event.stopPropagation();
   }, { passive: false });
 
   document.addEventListener('touchstart', function (event) {
     if (event.touches.length > 0) {
       this._lastX = event.touches[0].clientX;
+      this._lastY = event.touches[0].clientY;
     }
-  }, { passive: true });
+    event.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchmove', function (event) {
+    if (event.touches.length >= 1) {
+      const touch = event.touches[0];
+      const deltaX = Math.abs(touch.clientX - (this._lastX || touch.clientX));
+      const deltaY = Math.abs(touch.clientY - (this._lastY || touch.clientY));
+
+      if (deltaX > 1 || deltaY > 1 || event.touches.length > 1) {
+        event.preventDefault();
+      }
+
+      this._lastX = touch.clientX;
+      this._lastY = touch.clientY;
+    }
+  }, { passive: false });
+
+  document.addEventListener('gesturestart', function (event) {
+    event.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('gesturechange', function (event) {
+    event.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('gestureend', function (event) {
+    event.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchend', function (event) {
+    event.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+  });
 
   // ==========================================
   // IMPORTANTE: Substitua pela URL do seu Google Apps Script

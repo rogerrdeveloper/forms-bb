@@ -18,8 +18,23 @@
     color: #1a2332;
     line-height: 1.6;
     padding: 16px;
-    touch-action: pan-y;
+    touch-action: none;
+    overscroll-behavior: none;
     overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: 100%;
+    image-rendering: auto;
+  }
+
+  .option-label,
+  .submit-btn,
+  input,
+  button {
+    touch-action: none;
+    -webkit-user-select: none;
     user-select: none;
   }
 
